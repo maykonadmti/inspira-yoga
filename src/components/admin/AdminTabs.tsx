@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { supabase } from '../../lib/supabase';
+import { supabase, isSupabaseConfigured } from '../../lib/supabase';
 import { Trash2, Plus, Save, Users } from 'lucide-react';
+import ImageUpload from './ImageUpload';
 
 const notify = (msg: string) => alert(msg);
 
@@ -48,10 +49,11 @@ export const HeroTab = () => {
           <label className="block text-sm font-medium mb-1 text-charcoal/80">Texto Botão Secundário</label>
           <input className="w-full p-3 bg-sand border border-transparent focus:border-sage focus:bg-white rounded-xl outline-none transition-colors" value={data.secondaryText} onChange={e => setData({...data, secondaryText: e.target.value})} />
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1 text-charcoal/80">URL da Imagem de Fundo</label>
-          <input className="w-full p-3 bg-sand border border-transparent focus:border-sage focus:bg-white rounded-xl outline-none transition-colors" value={data.backgroundImage} onChange={e => setData({...data, backgroundImage: e.target.value})} />
-        </div>
+        <ImageUpload 
+          value={data.backgroundImage} 
+          onChange={url => setData({...data, backgroundImage: url})} 
+          label="Imagem de Fundo (Hero)" 
+        />
         <button onClick={handleSave} disabled={loading} className="px-6 py-3 bg-charcoal text-white rounded-xl font-medium hover:bg-charcoal/90 transition-colors flex items-center gap-2 mt-4">
           <Save size={18} /> {loading ? 'Salvando...' : 'Salvar Alterações'}
         </button>
@@ -106,10 +108,11 @@ export const AboutTab = () => {
             <label className="block text-sm font-medium mb-1 text-charcoal/80">Descrição</label>
             <textarea className="w-full p-3 bg-sand border border-transparent focus:border-sage focus:bg-white rounded-xl outline-none transition-colors" rows={5} value={data.description} onChange={e => setData({...data, description: e.target.value})} />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1 text-charcoal/80">URL da Imagem</label>
-            <input className="w-full p-3 bg-sand border border-transparent focus:border-sage focus:bg-white rounded-xl outline-none transition-colors" value={data.image} onChange={e => setData({...data, image: e.target.value})} />
-          </div>
+          <ImageUpload 
+            value={data.image} 
+            onChange={url => setData({...data, image: url})} 
+            label="Foto de Perfil" 
+          />
         </div>
 
         <div className="pt-4 border-t border-sand">
@@ -190,8 +193,12 @@ export const ExperienceTab = () => {
           <input type="number" placeholder="Duração (segundos)" className="w-1/2 p-3 bg-white border border-transparent focus:border-sage rounded-xl outline-none" value={newAsana.duracao_segundos} onChange={e => setNewAsana({...newAsana, duracao_segundos: Number(e.target.value)})} />
           <input type="number" placeholder="Ordem" className="w-1/2 p-3 bg-white border border-transparent focus:border-sage rounded-xl outline-none" value={newAsana.ordem} onChange={e => setNewAsana({...newAsana, ordem: Number(e.target.value)})} />
         </div>
-        <input placeholder="URL da Imagem" className="w-full p-3 bg-white border border-transparent focus:border-sage rounded-xl outline-none" value={newAsana.imagem_url} onChange={e => setNewAsana({...newAsana, imagem_url: e.target.value})} />
-        <button onClick={handleAdd} disabled={loading} className="px-6 py-3 bg-sage text-white rounded-xl font-medium hover:bg-sage/90 transition-colors flex items-center gap-2">
+        <ImageUpload 
+          value={newAsana.imagem_url} 
+          onChange={url => setNewAsana({...newAsana, imagem_url: url})} 
+          label="Imagem da Postura" 
+        />
+        <button onClick={handleAdd} disabled={loading} className="px-6 py-3 bg-sage text-white rounded-xl font-medium hover:bg-sage/90 transition-colors flex items-center gap-2 mt-2">
           <Plus size={18} /> Adicionar Postura
         </button>
       </div>
@@ -352,6 +359,12 @@ export const LeadsTab = () => {
     <div className="p-6 bg-white rounded-2xl shadow-sm">
       <h2 className="text-xl font-serif mb-6">Leads Capturados</h2>
       
+      {!isSupabaseConfigured && (
+        <div className="mb-6 p-4 bg-blue-50 text-blue-800 text-sm rounded-xl border border-blue-100">
+          <strong>Modo Preview:</strong> O Supabase não está configurado. Os leads reais não podem ser carregados.
+        </div>
+      )}
+
       <div className="bg-sand rounded-2xl p-6 mb-8 flex items-center justify-between max-w-sm">
         <div>
           <p className="text-sm font-medium text-charcoal/60 uppercase tracking-wider mb-1">Total de Leads</p>

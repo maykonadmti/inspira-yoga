@@ -133,6 +133,12 @@ export default function LeadsSection({ content }: LeadsSectionProps) {
                   <p className="text-red-500 text-sm">Ocorreu um erro. Tente novamente.</p>
                 )}
 
+                {!isSupabaseConfigured && (
+                  <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded-lg border border-blue-100">
+                    <strong>Modo Preview:</strong> O banco de dados não está conectado. O cadastro será apenas simulado.
+                  </div>
+                )}
+
                 <button 
                   type="submit" 
                   disabled={status === 'loading'}

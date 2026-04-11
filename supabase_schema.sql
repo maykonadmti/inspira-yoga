@@ -81,8 +81,19 @@ CREATE POLICY "Apenas admins podem ver leads" ON leads FOR SELECT USING (auth.ro
 CREATE POLICY "Apenas admins podem modificar leads" ON leads FOR UPDATE USING (auth.role() = 'authenticated');
 CREATE POLICY "Apenas admins podem deletar leads" ON leads FOR DELETE USING (auth.role() = 'authenticated');
 
--- Inserir dados padrão (Opcional, para não começar vazio)
-INSERT INTO site_content (chave, valor) VALUES 
-('hero', '{"title": "Respire. Conecte-se. Transforme-se.", "subtitle": "Práticas de yoga e respiração consciente para trazer mais equilíbrio e presença para o seu dia a dia.", "ctaText": "Começar agora", "secondaryText": "Saiba mais", "backgroundImage": "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?q=80&w=2000&auto=format&fit=crop"}'),
-('about', '{"title": "Sobre Mim", "description": "Olá, sou Maykon. Minha jornada com o yoga começou há mais de 10 anos. Acredito que a prática deve ser acessível, orgânica e adaptada à realidade de cada um. Meu foco é ajudar você a encontrar espaço no corpo e na mente através da respiração consciente e do movimento fluido.", "image": "https://images.unsplash.com/photo-1599447421416-3414500d18a5?q=80&w=800&auto=format&fit=crop", "stats": [{"label": "Anos de Experiência", "value": "10+"}, {"label": "Alunos Transformados", "value": "500+"}, {"label": "Estilo de Prática", "value": "Vinyasa & Hatha"}]}'),
-('settings', '{"kiwifyUrl": ""}');
+-- 6. Storage (Upload de Imagens)
+-- Criar o bucket 'images' se ele não existir
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('images', 'images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Políticas de Storage para o bucket 'images'
+-- Permitir leitura pública
+CREATE POLICY "Imagens públicas" ON storage.objects FOR SELECT USING (bucket_id = 'images');
+
+-- Permitir upload apenas para usuários autenticados
+CREATE POLICY "Upload apenas para admins" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'images' AND auth.role() = 'authenticated');
+
+-- Permitir update/delete apenas para usuários autenticados
+CREATE POLICY "Update apenas para admins" ON storage.objects FOR UPDATE USING (bucket_id = 'images' AND auth.role() = 'authenticated');
+CREATE POLICY "Delete apenas para admins" ON storage.objects FOR DELETE USING (bucket_id = 'images' AND auth.role() = 'authenticated');
